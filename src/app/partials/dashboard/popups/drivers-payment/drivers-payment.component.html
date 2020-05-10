@@ -1,0 +1,17 @@
+<div id="container" class="flex h-full flex-col">
+    <div class="header p-4 flex justify-center items-center text-xl border-b border-gray-400">
+        Advance Payment
+    </div>
+    <div class="body overflow-y-auto flex-auto">
+        <div *ngIf="! form" class="h-full w-full flex justify-center items-center">
+            <mat-spinner diameter="20"></mat-spinner>
+        </div>
+        <form *ngIf="form" class="popup-conatiner" [formGroup]="form.formGroup" class="p-2">
+            <cb-field [field]="field" [group]="form.sections[0].formGroup" *ngFor="let field of form.sections[0].fields"></cb-field>  
+        </form>
+    </div>
+    <div class="footer border-t border-gray-400 p-2 flex justify-end items-center">
+        <button (click)="savePayment()" class="rounded border p-2 ml-2 border-green-400 bg-green-200 hover:bg-green-400 hover:text-white flex justify-center items-center">Confirm</button>
+        <button (click)="closePopup()" class="rounded border p-2 ml-2 border-gray-200 hover:bg-red-400 hover:text-white flex justify-center items-center">Cancel</button>
+    </div>
+</div>
