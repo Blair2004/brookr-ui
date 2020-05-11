@@ -25,7 +25,7 @@ export class LayoutComponent implements OnInit, OnDestroy, OnChanges {
     public store: Store<{ state: AppState }>,
     private notificationService: NotificationsService,
     private snackbar: MatSnackBar,
-    private tendoo: TendooService,
+    public tendoo: TendooService,
   ) { }
 
   ngOnInit(): void {

@@ -1,6 +1,8 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { TableConfig } from '@cloud-breeze/core';
+import { TableConfig, Field } from '@cloud-breeze/core';
+import { ValidationGenerator } from '@cloud-breeze/utilities';
+import { FormGroup } from '@angular/forms';
 
 interface Row {
   columns: {
@@ -29,6 +31,12 @@ interface TableConfigExtended extends TableConfig {
     [key:string] : {
       label: string;
       direction: null | string;
+      type?: Field[ 'type' ];
+      options?: {
+        label: string;
+        value: string;
+      }[];
+      field: Field;
       props?: {
         style?: {
           [key:string]: any
@@ -54,6 +62,7 @@ export class TableComponent implements OnInit {
   // columns   = [];
   @Input( 'bulk' ) bulk;
   searchOn  = false;
+  advancedFilter: { fields: Field[], formGroup: FormGroup };
 
   @Input( 'config' ) 
   set config( config: TableConfigExtended ) {
@@ -99,6 +108,7 @@ export class TableComponent implements OnInit {
   @Output( 'search-status' ) searchStatus = new EventEmitter();
   @Output( 'pageSize' ) pageSize          = new EventEmitter();
   @Output( 'refresh' ) refresh            = new EventEmitter();
+  @Output( 'advanced' ) advanced          = new EventEmitter();
 
   columnsNames: string[];
 
@@ -220,5 +230,27 @@ export class TableComponent implements OnInit {
     }
 
     return rangeWithDots;
+  }
+
+  closeSearch() {
+    this.searchOn         = false;
+    this.advancedFilter   = void(0);
+  }
+
+  openAdvanced() {
+    for( let column in this.columns ) {
+      if ( this.columns[ column ].type ) {
+        this.columns[ column ].field  = {
+          label: this.columns[ column ].label,
+          type: this.columns[ column ].type,
+          name: column,
+          control: null
+        }
+      }
+    }
+
+    const fields          = Object.values( this.columns ).map( c => c.field ).filter( f => f !== undefined );
+    this.advancedFilter   = ValidationGenerator.buildFormGroup( fields );
+    console.log( fields, this.advancedFilter );
   }
 }

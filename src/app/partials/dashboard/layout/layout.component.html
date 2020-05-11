@@ -14,7 +14,10 @@
             id="sidebar" [ngClass]="{ 
             'absolute shadow z-50' : ( state$ | async ).sidebarToggled, 
             'hidden' : ! ( state$ | async ).sidebarToggled,
-            'w-64' : ! ( state$ | async ).sidebarCompressed,
+            'w-64' : ! ( state$ | async ).sidebarCompressed || [ true ].includes( 
+                tendoo.responsive.isLG(), 
+                tendoo.responsive.isXL()
+            ),
             'w-16' : ( state$ | async ).sidebarCompressed
         }" class="lg:static lg:shadow-none h-full lg:flex lg:z-0 flex flex-col flex-shrink-0 bg-gray-200 p-2">
             <div class="logo flex pb-4 justify-center text-gray-800">

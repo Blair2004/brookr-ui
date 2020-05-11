@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { TendooService } from '@cloud-breeze/services';
 import { ValidationGenerator } from "@cloud-breeze/utilities";
 import { Field } from '@cloud-breeze/core';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-auth',
@@ -30,10 +31,12 @@ export class AuthComponent implements OnInit {
       this.fields   = result.fields;
       this.loaded   = true;
       // debug
-      // this.form.get( 'username' ).setValue( 'paolino' );
-      // this.form.get( 'username' ).setValue( 'admin' );
-      // this.form.get( 'password' ).setValue( 'sanches' );
-      // this.login();
+      if ( ! environment.production ) {
+        // this.form.get( 'username' ).setValue( 'paolino' );
+        this.form.get( 'username' ).setValue( 'admin' );
+        this.form.get( 'password' ).setValue( 'sanches' );
+        this.login();
+      }
     }, ( result ) => {
       this.snackbar.open( result[ 'error' ][ 'message' ] || result.message || 'An unexpected error has occured', 'TRY AGAIN' )
         .afterDismissed()

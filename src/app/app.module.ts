@@ -8,7 +8,7 @@ import { StoreModule } from '@ngrx/store';
 import { AppReducer } from './store/state';
 import { CommonModule } from '@angular/common';
 import { CoreModule } from '@cloud-breeze/core';
-import { ServicesModule, TendooService } from '@cloud-breeze/services';
+import { ServicesModule } from '@cloud-breeze/services';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Interceptor } from './classes/interceptor.class';
 import { LoadAssignationComponent } from './partials/dashboard/load-assignation/load-assignation.component';
@@ -20,6 +20,7 @@ import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoadDeliveryComponent } from './partials/dashboard/popups/load-delivery/load-delivery.component';
 import { DriversPaymentComponent } from './partials/dashboard/popups/drivers-payment/drivers-payment.component';
+import { environment } from '../environments/environment';
 
 export const serviceCalled   = ServicesModule;
 
@@ -56,8 +57,7 @@ export const serviceCalled   = ServicesModule;
     }),
     ServicesModule.forRoot({
       angular: '',
-      base: 'http://brookr.nexopos.com/api/',
-      // base: 'http://laravel-7001.std/api/'
+      base: environment.baseUrl
     })
   ],
   bootstrap: [AppComponent]
