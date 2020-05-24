@@ -28,10 +28,11 @@ export class ManageComponent implements OnInit {
         this.mode   = 'edit'
         this.id   = param.get( 'id' );
       }
-    });
 
-    this.tendoo.forms.getPublicForm( 'brookr.customers' ).subscribe( ( form: Form ) => {
-      this.form   = form;
+      this.tendoo.forms.getPublicForm( 'brookr.customers' + ( this.mode === 'edit' ? '/' + this.id : '' ) ).subscribe( ( form: Form ) => {
+        this.form   = form;
+      });
+
     });
   }
 

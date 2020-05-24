@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, OnChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, isDevMode } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subscription, interval } from 'rxjs';
 import { AppState } from '../../../store/state';
@@ -21,6 +21,8 @@ export class LayoutComponent implements OnInit, OnDestroy, OnChanges {
   user;
   loopInterval: Subscription;
   menuIconToggled: boolean  = true;
+  urlPrefix   = ! isDevMode() ? '/modules/brookr/brookr' : '';
+  
   constructor(
     public store: Store<{ state: AppState }>,
     private notificationService: NotificationsService,
@@ -125,5 +127,9 @@ export class LayoutComponent implements OnInit, OnDestroy, OnChanges {
 
   toggleMenuIcons() {
     this.store.dispatch( AppActions.toggleSidebarCompression() );
+  }
+
+  closeAllMenus() {
+    this.store.dispatch( AppActions.toggleSidebarSubMenus({ status: false }) );
   }
 }

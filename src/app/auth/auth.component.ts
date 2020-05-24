@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, isDevMode } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -17,6 +17,8 @@ export class AuthComponent implements OnInit {
   form: FormGroup;
   loaded        = false;
   isLoggingIn   = false;
+  urlPrefix   = ! isDevMode() ? '/modules/brookr/brookr' : '';
+
   constructor(
     private tendoo: TendooService,
     private snackbar: MatSnackBar,
@@ -35,7 +37,7 @@ export class AuthComponent implements OnInit {
         // this.form.get( 'username' ).setValue( 'paolino' );
         this.form.get( 'username' ).setValue( 'admin' );
         this.form.get( 'password' ).setValue( 'sanches' );
-        this.login();
+        // this.login();
       }
     }, ( result ) => {
       this.snackbar.open( result[ 'error' ][ 'message' ] || result.message || 'An unexpected error has occured', 'TRY AGAIN' )

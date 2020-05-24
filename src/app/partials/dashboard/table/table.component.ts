@@ -3,6 +3,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { TableConfig, Field } from '@cloud-breeze/core';
 import { ValidationGenerator } from '@cloud-breeze/utilities';
 import { FormGroup } from '@angular/forms';
+import * as moment from "moment";
 
 interface Row {
   columns: {
@@ -105,6 +106,8 @@ export class TableComponent implements OnInit {
   @Output( 'navigate' ) navigate          = new EventEmitter;
   @Output( 'action' ) action              = new EventEmitter();
   @Output( 'search' ) search              = new EventEmitter<string>();
+  @Output( 'query-search' ) querySearch   = new EventEmitter<{ query : any }>();
+  @Output( 'close-search' ) closeSearchEv = new EventEmitter<boolean>();
   @Output( 'search-status' ) searchStatus = new EventEmitter();
   @Output( 'pageSize' ) pageSize          = new EventEmitter();
   @Output( 'refresh' ) refresh            = new EventEmitter();
@@ -116,9 +119,7 @@ export class TableComponent implements OnInit {
     this.bulk   =   this.bulk || [];
   }
 
-  ngOnInit() {
-    
-  }
+  ngOnInit() {}
 
   get selected() {
     return this.rows.filter( entry => entry.$props[ 'checked' ]);
@@ -168,9 +169,6 @@ export class TableComponent implements OnInit {
     };
 
     this.sort.emit( sort );
-
-    console.log( sort );
-
   }
 
   changeStatus( checkbox: MatCheckboxChange ) {
@@ -235,22 +233,36 @@ export class TableComponent implements OnInit {
   closeSearch() {
     this.searchOn         = false;
     this.advancedFilter   = void(0);
+    this.closeSearchEv.emit(true);
   }
 
   openAdvanced() {
-    for( let column in this.columns ) {
-      if ( this.columns[ column ].type ) {
-        this.columns[ column ].field  = {
-          label: this.columns[ column ].label,
-          type: this.columns[ column ].type,
-          name: column,
-          control: null
+    if ( this.advancedFilter === undefined ) {
+      for( let column in this.columns ) {
+        if ( this.columns[ column ].type ) {
+          this.columns[ column ].field  = {
+            label: this.columns[ column ].label,
+            type: this.columns[ column ].type,
+            name: column,
+            options: this.columns[ column ].options || [],
+            control: null
+          }
         }
       }
+  
+      const fields          = Object.values( this.columns ).map( c => c.field ).filter( f => f !== undefined );
+      this.advancedFilter   = ValidationGenerator.buildFormGroup( fields );
     }
+  }
 
+  emitSearchWithQuery() {
     const fields          = Object.values( this.columns ).map( c => c.field ).filter( f => f !== undefined );
-    this.advancedFilter   = ValidationGenerator.buildFormGroup( fields );
-    console.log( fields, this.advancedFilter );
+    fields.forEach( field => {
+      if ([ 'ng-datetime', 'datetime' ].includes( field.type ) ) {
+        field.control.setValue( moment( field.control.value ).format() )
+      }
+    });
+    this.querySearch.emit({ query : this.advancedFilter.formGroup.value });
+    console.log( this.advancedFilter );
   }
 }

@@ -1,11 +1,12 @@
 <div id="container" class="bg-gray-200 h-full flex justify-center items-center">
     <div class="p-2 w-full sm:w-2/3 md:w-1/2 lg:w-2/6 xl:1/4 flex flex-col items-center">
-        <span class="brookr-font block text-6xl my-3 text-gray-800">Brookr</span>
-        <span class="my-2 text-gray-700">Loads Delivery Application</span>
+        <span class="brookr-font block text-6xl my-3 text-gray-800">
+            <img [src]="urlPrefix + '/assets/images/logo.png'" alt="">
+        </span>
         <div class="flex justify-center my-10" *ngIf="! loaded">
             <mat-progress-spinner diameter="60" mode="indeterminate"></mat-progress-spinner>
         </div>
-        <div id="login-card" *ngIf="loaded" class="rounded-lg w-full shadow bg-white p-4 my-10">
+        <div id="login-card" *ngIf="loaded" class="rounded-lg w-full shadow bg-white p-4 mt-2 mb-10">
             <form [formGroup]="form">
                 <cb-field [group]="form" [field]="field" *ngFor="let field of fields"></cb-field>
                 <div class="button-container py-3 flex justify-end">

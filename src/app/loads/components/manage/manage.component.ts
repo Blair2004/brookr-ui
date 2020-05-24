@@ -6,6 +6,7 @@ import { Form } from '@cloud-breeze/core';
 import { TendooService } from '@cloud-breeze/services';
 import { ValidationGenerator } from '@cloud-breeze/utilities';
 import { LoadsService } from '../../../services/loads.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-manage',
@@ -60,8 +61,19 @@ export class ManageComponent implements OnInit {
     }
 
     this.form.sections.forEach( s => ValidationGenerator.deactivateFields( s.fields ) );
-    console.log( this.form.formGroup.value );
-    this.loadsService.registerLoads( this.form.formGroup.value, this.id ).subscribe( result => {
+
+    const formData  = Object.assign({}, this.form.formGroup.value );
+
+    this.form.sections.forEach( s => {
+      s.fields.forEach( field => {
+        if ([ 'ng-datetime' ].includes( field.type ) ) {
+          // field.control.setValue( 'Hello' );
+          formData[ s.namespace ][ field.name ]   = moment( field.control.value ).format( 'YYYY-MM-DD HH:mm' );
+        }
+      })
+    });
+
+    this.loadsService.registerLoads( formData, this.id ).subscribe( result => {
       this.snackbar.open( result[ 'message' ], 'OK', { duration: 3000 });
       this.router.navigateByUrl( '/dashboard/loads' );
     }, ( result: HttpErrorResponse ) => {

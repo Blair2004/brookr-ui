@@ -20,10 +20,12 @@ export class ListComponent implements OnInit {
   sort        = {};
   search      = {};
   page        = {};
+  query       = {};
   bulkMenus   = [];
   perPage     = {
     per_page : 10
   }
+  hasLoaded   = false;
   constructor(
     private tendoo: TendooService,
     private snackbar: MatSnackBar,
@@ -32,9 +34,19 @@ export class ListComponent implements OnInit {
   ) { }
 
   loadConfiguration() {
-    this.tendoo.crud.getConfig( 'brookr.loads', { ...this.page, ...this.search, ...this.sort, ...this.perPage }).subscribe( ( result: TableConfig ) => {
-      this.config   = result;
-    });
+    if ( this.hasLoaded === false ) {
+      this.tendoo.crud.getConfig( 'brookr.loads', { ...this.page, ...this.search, ...this.sort, ...this.perPage, ...this.query }).subscribe( ( result: TableConfig ) => {
+        this.config   = result;
+      });
+      this.hasLoaded  = true;
+    } else {
+      this.tendoo.crud.getEntries( 'brookr.loads', { ...this.page, ...this.search, ...this.sort, ...this.perPage, ...this.query }).subscribe( (results: TableConfig[ 'results' ]) => {
+        this.config   = {
+          ...this.config,
+          results
+        };
+      });
+    }
   }
 
   ngOnInit(): void {
@@ -77,6 +89,16 @@ export class ListComponent implements OnInit {
         })
       }
     }]
+  }
+
+  handlePageSize( event ) {
+    this.perPage  = { per_page : event };
+    this.loadConfiguration();
+  }
+
+  handleNavigation( page ) {
+    this.page   = { page };
+    this.ngOnInit();
   }
 
   handleAction( event ) {
@@ -162,9 +184,23 @@ export class ListComponent implements OnInit {
     this.ngOnInit();
   }
 
+  handleCloseSearch() {
+    this.query  = {};
+  }
+
   handlePagineNavigation( event ) {
     this.perPage  = { per_page : event.pageSize };
     this.page     = { page : event.pageIndex + 1};
+    this.ngOnInit();
+  }
+
+  handleQuerySearch( event ) {
+    this.search   = {};
+    this.query    = {
+      ...event.query,
+      queryFilter : true
+    }
+
     this.ngOnInit();
   }
 }

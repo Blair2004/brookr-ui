@@ -35,7 +35,10 @@
                 </button>
                 <div *ngIf="searchOn" class="search-field bg-indigo-200 rounded-full overflow-hidden">
                     <input #searchField type="text" class="h-8 ml-1 pl-2 rounded-l-full bg-indigo-100 outline-none">
-                    <button (click)="emitSearch( searchField )" mat-icon-button class="ml-1 outline-none">
+                    <button (click)="emitSearch( searchField )" *ngIf="advancedFilter === undefined" mat-icon-button class="ml-1 outline-none">
+                        <mat-icon>search</mat-icon>
+                    </button>
+                    <button (click)="emitSearchWithQuery()" *ngIf="advancedFilter !== undefined" mat-icon-button class="ml-1 outline-none">
                         <mat-icon>search</mat-icon>
                     </button>
                 </div>
@@ -68,7 +71,16 @@
                         </td>
                     </tr>
                 </thead>
-                <tbody *ngIf="! advancedFilter">
+                <tbody *ngIf="advancedFilter">
+                    <tr>
+                        <td *ngFor="let columnName of columnsNames" class="border-gray-200 text-gray-800">
+                            <ng-container *ngIf="columns[ columnName ].field">
+                                <cb-field [field]="columns[ columnName ].field" [group]="advancedFilter.formGroup"></cb-field>
+                            </ng-container>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody>
                     <tr *ngFor="let row of rows" [ngClass]="row?.$props?.className">
                         <td *ngFor="let columnName of columnsNames" [ngClass]="row?.$props?.tdClassName || 'border-gray-200 text-gray-800'" class="p-2 border">
                             <div class="flex justify-between items-center">
@@ -85,15 +97,6 @@
                     </tr>
                     <tr *ngIf="rows.length === 0">
                         <td [attr.colspan]="columnsNames.length"><span class="text-gray-700 text-center py-2 block">There is no entries...</span></td>
-                    </tr>
-                </tbody>
-                <tbody *ngIf="advancedFilter">
-                    <tr>
-                        <td *ngFor="let columnName of columnsNames" class="border-gray-200 text-gray-800">
-                            <ng-container *ngIf="columns[ columnName ].field">
-                                <cb-field [field]="columns[ columnName ].field" [group]="advancedFilter.formGroup"></cb-field>
-                            </ng-container>
-                        </td>
                     </tr>
                 </tbody>
             </table>
