@@ -6,6 +6,7 @@ import { TendooService } from '@cloud-breeze/services';
 import { ValidationGenerator } from "@cloud-breeze/utilities";
 import { Field } from '@cloud-breeze/core';
 import { environment } from '../../environments/environment';
+import * as moment from "moment";
 
 @Component({
   selector: 'app-auth',
@@ -59,16 +60,24 @@ export class AuthComponent implements OnInit {
 
     this.isLoggingIn  = true;
     ValidationGenerator.deactivateFields( this.fields );
+    
     this.tendoo.auth.login( this.form.value ).subscribe( result => {
+
       this.activatedRoute.queryParamMap.subscribe( param => {
+
         this.tendoo.auth.setCredentials( result[ 'user' ], result[ 'token' ]);
+        const now   =   moment.now();
+        this.tendoo.cookie.set( 'auth.user', result[ 'token' ], moment( now ).add( 7, 'days' ).toDate(), '/' );
+
         this.tendoo.get( `${this.tendoo.baseUrl}brookr/profile/avatar` ).subscribe( avatar => {
-          console.log( result[ 'user' ].role.namespace );
           const path = param.get( 'redirect' ) || ( result[ 'user' ].role.namespace === 'brookr.drivers' ? '/dashboard/drivers/loads' : '/dashboard' );
+
           result[ 'user' ].avatar   = avatar[ 'link' ] || null;
+
           this.snackbar.open( result[ 'message' ], null, { duration: 3000 });
           this.router.navigateByUrl( path );
         })
+
       })
     }, ( result ) => {
       this.isLoggingIn  = false;

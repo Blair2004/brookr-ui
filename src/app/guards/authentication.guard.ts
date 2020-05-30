@@ -20,14 +20,20 @@ export class AuthenticationGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
       return new Promise( ( resolve, reject ) => {
-        if ( this.tendoo.auth.getUser() !== undefined ) {
+        if ( this.tendoo.auth.getUser() ) {
+          return this.auth.getRoleAndPermissions().subscribe( result => {
+            resolve( true );
+          })
+        }
+
+        this.tendoo.auth.tokenLogin( this.tendoo.cookie.get( 'auth.user' ) ).subscribe( result => {
           this.auth.getRoleAndPermissions().subscribe( result => {
             resolve( true );
           })
-        } else {
+        }, ( error ) => {
           this.router.navigateByUrl( '/auth/login?redirect=' + state.url );
           this.snackbar.open( 'Please login first', null, { duration: 3000 });
-        }
+        });
       });
   }
   

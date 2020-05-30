@@ -3,5 +3,10 @@
         <span class="block text-2xl mb-2">Brookr Settings</span> 
         <p class="text-sm">configure the application.</p>
     </div>
+    <div class="rounded border border-blue-500 bg-blue-100 p-2 my-2">
+        Here are the available template. A template tag should be used with an opening brace '&#123;' and a closing brace '&#125;'. For example '&#123;pickup_date&#125;'.
+
+        Tag Reference : &#123;load_id&#125;, &#123;load_reference&#125;, &#123;delivery_city&#125;, &#123;delivery_date&#125;, &#123;pickup_city&#125;, &#123;pickup_date&#125;, &#123;pickup_reference&#125;, &#123;load_trailer&#125;, &#123;drop_trailer&#125;, &#123;empty_trailer&#125;.
+    </div>
     <app-tabs [form]="form" *ngIf="form" (submit)="handleSubmit( $event )"></app-tabs>
 </app-layout>

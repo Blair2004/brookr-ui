@@ -117,6 +117,12 @@ export class ListComponent implements OnInit {
       this.openLoadAssignation( event.menu );
     } else if ( event.menu.type === 'OPEN' && event.menu.namespace === 'open.change_status' ) {
       this.openLoadChangeStatus( event.menu );
+    } else if ( [ 'rate_document_url', 'delivery_document_url' ].includes( event.menu.namespace ) ) {
+      this.tendoo.get( `${this.tendoo.baseUrl}brookr/loads/doc/${event.row.id}/${event.menu.namespace}` ).subscribe( result => {
+        window.open( result[ 'data' ].url );
+      }, ( result: HttpErrorResponse ) => {
+        this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 3000 });
+      })
     }
   }
 

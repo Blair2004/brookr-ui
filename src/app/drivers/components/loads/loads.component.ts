@@ -3,12 +3,15 @@ import { TendooService } from '@cloud-breeze/services';
 import { BrookrTableConfig } from '../../../interfaces/TableConfig';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { FormGroup } from "@angular/forms";
 import { MatDialog } from '@angular/material/dialog';
-import { DialogComponent, Dialog } from '@cloud-breeze/core';
+import { DialogComponent, Dialog, Form } from '@cloud-breeze/core';
 import { DriverLoadStatus } from '../../../partials/dashboard/driver-load-status/driver-load-status.component';
 import { ConfirmDialogObject } from 'projects/cloud-breeze/core/src/lib/interfaces/confirm-dialog';
 import { PopupComponent } from '../../../partials/dashboard/popup/popup.component';
 import { LoadDeliveryComponent } from '../../../partials/dashboard/popups/load-delivery/load-delivery.component';
+import { Popup } from '../../../interfaces/Popup';
+import { ValidationGenerator } from '@cloud-breeze/utilities';
 
 @Component({
   selector: 'app-loads',
@@ -85,18 +88,45 @@ export class LoadsComponent implements OnInit {
         this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 6000 });
       })
     } else if ( action.menu.namespace === 'brookr.start-delivery' ) {
-      this.dialog.open( DialogComponent, {
+      this.dialog.open( PopupComponent, {
         id: 'start-delivery',
+        data: <Popup>{
+          title: 'Starting Delivery',
+          formNamespace: 'brookr.drivers-delivery-start',
+          description: 'Please provide (if possible) the drop and load tailer reference.',
+          cancel: () => {
+            this.dialog.getDialogById( 'start-delivery' ).close();
+          },
+          confirm: ( form: Form ) => {
+            form.sections.forEach( s => {
+              ValidationGenerator.touchAllFields( s.formGroup );
+            });
+
+            if ( form.formGroup.invalid ) {
+              return this.snackbar.open( 'Unable to proceed the form is not valid.', 'OK', { duration: 3000 });
+            }
+
+            this.tendoo.post( `${this.tendoo.baseUrl}brookr/loads/start`, form.formGroup.value ).subscribe( result => {
+              this.snackbar.open( result[ 'message' ], 'OK', { duration: 3000 });
+            }, ( result: HttpErrorResponse ) => {
+              this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 5000 });
+            })
+          }
+        }
+      })
+    } else if ( action.menu.namespace === 'brookr.await-load' ) {
+      this.dialog.open( DialogComponent, {
+        id: 'awaiting-load',
         data: <ConfirmDialogObject>{
-          title: 'Start Delivery',
-          message: 'Would you like to start delivery now ?',
+          title: 'Awaiting Load',
+          message: 'Confirm you\'ve reached the delivery location and you\'re awaiting load ?',
           buttons: [
             {
               namespace: 'yes',
               label: 'Yes',
               onClick: () => {
-                this.dialog.getDialogById( 'start-delivery' ).close();
-                this.tendoo.get( `${this.tendoo.baseUrl}brookr/loads/start/{id}`.replace( '{id}', action.row.id) ).subscribe( result => {
+                this.dialog.getDialogById( 'awaiting-load' ).close();
+                this.tendoo.get( `${this.tendoo.baseUrl}brookr/loads/awaiting/{id}`.replace( '{id}', action.row.id) ).subscribe( result => {
                   this.setTabActive( this.active );
                   this.snackbar.open( result[ 'message' ], 'OK', { duration: 3000 });
                 })
@@ -105,7 +135,7 @@ export class LoadsComponent implements OnInit {
               namespace: 'no',
               label: 'No',
               onClick: () => {
-                this.dialog.getDialogById( 'start-delivery' ).close();
+                this.dialog.getDialogById( 'awaiting-load' ).close();
               }
             }
           ]

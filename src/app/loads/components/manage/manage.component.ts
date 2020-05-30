@@ -62,16 +62,25 @@ export class ManageComponent implements OnInit {
 
     this.form.sections.forEach( s => ValidationGenerator.deactivateFields( s.fields ) );
 
-    const formData  = Object.assign({}, this.form.formGroup.value );
+    const formData    =  new FormData;
 
     this.form.sections.forEach( s => {
       s.fields.forEach( field => {
-        if ([ 'ng-datetime' ].includes( field.type ) ) {
-          // field.control.setValue( 'Hello' );
-          formData[ s.namespace ][ field.name ]   = moment( field.control.value ).format( 'YYYY-MM-DD HH:mm' );
+        if ( [ 'ng-datetime' ].includes( field.type ) ) {
+          formData.append( 
+            s.namespace + '--' + field.name, 
+            moment( field.control.value ).format( 'YYYY-MM-DD HH:mm' ) 
+          );
+        } else {
+          formData.append( 
+            s.namespace + '--' + field.name, 
+            field.control.value
+          );
         }
       })
     });
+
+    console.log( formData );
 
     this.loadsService.registerLoads( formData, this.id ).subscribe( result => {
       this.snackbar.open( result[ 'message' ], 'OK', { duration: 3000 });

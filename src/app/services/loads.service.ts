@@ -13,7 +13,7 @@ export class LoadsService {
   }
 
   registerLoads( fields, index = undefined ) {
-    return this.tendoo[ index === undefined ? 'post' : 'put' ]( `${this.baseUrl}brookr/loads${index !== undefined ? '/' + index : ''}`, fields );
+    return this.tendoo[ index === undefined ? 'post' : 'post' ]( `${this.baseUrl}brookr/loads${index !== undefined ? '/edit/' + index : ''}`, fields );
   }
 
   getUnassignedLoads() {
