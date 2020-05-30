@@ -18,6 +18,7 @@ export class LogoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.tendoo.auth.logout().subscribe( result => {
+      this.tendoo.cookie.delete( 'auth.user' );
       this.snackbar.open( result[ 'message' ], 'OK', { duration: 3000 });
       this.router.navigateByUrl( '/auth/login' );
     })

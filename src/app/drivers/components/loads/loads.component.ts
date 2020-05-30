@@ -106,8 +106,9 @@ export class LoadsComponent implements OnInit {
               return this.snackbar.open( 'Unable to proceed the form is not valid.', 'OK', { duration: 3000 });
             }
 
-            this.tendoo.post( `${this.tendoo.baseUrl}brookr/loads/start`, form.formGroup.value ).subscribe( result => {
+            this.tendoo.post( `${this.tendoo.baseUrl}brookr/loads/start/${action.row.id}`, form.formGroup.value ).subscribe( result => {
               this.snackbar.open( result[ 'message' ], 'OK', { duration: 3000 });
+              this.dialog.getDialogById( 'start-delivery' ).close();
             }, ( result: HttpErrorResponse ) => {
               this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 5000 });
             })
