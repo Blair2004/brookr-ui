@@ -123,6 +123,39 @@ export class ListComponent implements OnInit {
       }, ( result: HttpErrorResponse ) => {
         this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 3000 });
       })
+    } else if ( event.menu.namespace === 'notify_delivery' ) {
+      this.dialog.open( DialogComponent, {
+        id: 'notify-delivery',
+        width: [
+          this.tendoo.responsive.isLG(),
+          this.tendoo.responsive.isMD(),
+          this.tendoo.responsive.isXL(),
+        ].includes( true ) ? '30%' : '90%',
+        data: <Dialog>{
+          title: 'Notify the delivery',
+          message: 'Would you like to notify the delivery of the Load ? This means the Proof Of Delivery and the Rate Document will be emailed to the company you have assigned on the settings. Please confirm.',
+          buttons: [
+            {
+              namespace: 'yes',
+              label: 'Send',
+              onClick: () => {
+                this.tendoo.get( event.menu.url.replace( '{id}', event.row.id ) ).subscribe( result => {
+                  this.dialog.getDialogById( 'notify-delivery' ).close();
+                  this.snackbar.open( result[ 'message' ], 'OK', { duration: 3000 });
+                }, ( result: HttpErrorResponse ) => {
+                  this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 6000 });
+                })
+              }
+            }, {
+              namespace: 'no',
+              label: 'Cancel',
+              onClick: () => {
+                this.dialog.getDialogById( 'notify-delivery' ).close();
+              }
+            }
+          ]
+        }
+      })
     }
   }
 

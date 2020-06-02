@@ -109,6 +109,7 @@ export class LoadsComponent implements OnInit {
             this.tendoo.post( `${this.tendoo.baseUrl}brookr/loads/start/${action.row.id}`, form.formGroup.value ).subscribe( result => {
               this.snackbar.open( result[ 'message' ], 'OK', { duration: 3000 });
               this.dialog.getDialogById( 'start-delivery' ).close();
+              this.handleRefresh();
             }, ( result: HttpErrorResponse ) => {
               this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 5000 });
             })
