@@ -1,9 +1,10 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { TendooService } from '@cloud-breeze/services';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
-import { Form } from '@cloud-breeze/core';
+import { Form, Dialog, DialogComponent } from '@cloud-breeze/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialogRef } from "@angular/material/dialog";
 import { ValidationGenerator } from '@cloud-breeze/utilities';
 import { AppState } from '../../../store/state';
 import { Store } from '@ngrx/store';
@@ -21,6 +22,7 @@ export class LoadAssignationComponent implements OnInit {
     private tendoo: TendooService,
     private store: Store<AppState>,
     private snackbar: MatSnackBar,
+    private dialogRef: MatDialogRef<LoadAssignationComponent>,
     @Inject( MAT_DIALOG_DATA ) private data: any,
     private dialog: MatDialog,
   ) { 
@@ -61,5 +63,34 @@ export class LoadAssignationComponent implements OnInit {
       this.form.sections.forEach( s => ValidationGenerator.enableFields( s.fields ) );
       this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 5000 });
     });
+  }
+
+  removeDriver() {
+    this.dialog.open( DialogComponent, {
+      id: 'confirm-remove-driver',
+      data: <Dialog> {
+        title: 'Unassigning The Driver',
+        message: 'Would you like to confirm the removal of the driver ?',
+        buttons: [
+          {
+            label: 'Yes',
+            onClick: () => {
+              this.tendoo.get( `${this.tendoo.baseUrl}brookr/loads/unassign/${this.orderId}` ).subscribe( result => {
+                this.snackbar.open( result[ 'message' ], 'OK', { duration: 3000 });
+                this.dialog.getDialogById( 'confirm-remove-driver' ).close();
+                this.dialogRef.close();
+              }, ( result: HttpErrorResponse ) => {
+                this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 6000 });
+              })
+            }
+          }, {
+            label: 'No',
+            onClick: () => {
+              this.dialog.getDialogById( 'confirm-remove-driver' ).close();
+            }
+          }
+        ]
+      }
+    })
   }
 }

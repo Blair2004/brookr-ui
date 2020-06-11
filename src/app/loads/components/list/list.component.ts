@@ -7,6 +7,7 @@ import { TendooService } from '@cloud-breeze/services';
 import { LoadAssignationComponent } from '../../../partials/dashboard/load-assignation/load-assignation.component';
 import { LoadStatusComponent } from '../../../partials/dashboard/load-status/load-status.component';
 import { HttpErrorResponse } from '@angular/common/http';
+import { LoadHistoryComponent } from '../../../partials/dashboard/load-history/load-history.component';
 
 @Component({
   selector: 'app-list',
@@ -118,10 +119,29 @@ export class ListComponent implements OnInit {
     } else if ( event.menu.type === 'OPEN' && event.menu.namespace === 'open.change_status' ) {
       this.openLoadChangeStatus( event.menu );
     } else if ( [ 'rate_document_url', 'delivery_document_url' ].includes( event.menu.namespace ) ) {
-      this.tendoo.get( `${this.tendoo.baseUrl}brookr/loads/doc/${event.row.id}/${event.menu.namespace}` ).subscribe( result => {
+      this.tendoo.get( `${this.tendoo.baseUrl}brookr/loads/${event.row.id}/assets/${event.menu.namespace}` ).subscribe( result => {
         window.open( result[ 'data' ].url );
       }, ( result: HttpErrorResponse ) => {
         this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 3000 });
+      })
+    } else if ( event.menu.namespace === 'open.load_history' ) {
+      this.tendoo.get( `${this.tendoo.baseUrl}brookr/loads/${event.row.id}/history` ).subscribe( ( history: any[] ) => {
+        if ( history.length === 0 ) {
+          return this.snackbar.open( 'This load doesn\'t have any history.', 'OK', { duration: 3000 });
+        }
+
+        this.dialog.open( LoadHistoryComponent, {
+          id: 'load-history',
+          data: { history },
+          width: [
+            this.tendoo.responsive.isLG(),
+            this.tendoo.responsive.isXL(),
+          ].includes( true ) ? '40%' : '90%',
+          height: [
+            this.tendoo.responsive.isLG(),
+            this.tendoo.responsive.isXL(),
+          ].includes( true ) ? '80%' : '90%',
+        })
       })
     } else if ( event.menu.namespace === 'notify_delivery' ) {
       this.dialog.open( DialogComponent, {

@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRouteSnapshot, ActivatedRoute, Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import * as moment from "moment";
 import { TendooService } from '@cloud-breeze/services';
-import { Form } from '@cloud-breeze/core';
+import { Form, Field } from '@cloud-breeze/core';
 import { ValidationGenerator } from '@cloud-breeze/utilities';
 import { DriversService } from '../../../services/drivers.service';
 
@@ -46,12 +47,47 @@ export class ManageComponent implements OnInit {
     section.active  = true;
   }
 
+  handleFieldChange( field: Field ) {
+    if ( field.type === 'file-upload' && field.data && typeof field.data[ 'upload' ] !== 'undefined' ) {
+      const formData    =   new FormData;
+      
+      formData.append( 
+        field.data[ 'upload' ].name || 'file',
+        field.control.value
+      );
+
+      formData.append( 'field', field.data[ 'upload' ].name || 'file' );
+
+      field.data[ 'upload' ].isUploading  = true;
+
+      this.tendoo.post( `${this.tendoo.baseUrl}brookr/medias/upload`, formData ).subscribe( ( result: Field ) => {
+        console.log( result );
+        field.control.setValue( result.value );
+        field.data[ 'upload' ].isUploading  = false;
+      }, ( result: HttpErrorResponse ) => {
+        field.data[ 'upload' ].isUploading  = false;
+        this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 3000 });
+      });
+    }
+  }
+
   handleSubmit( form: Form ) {
     this.form.sections.forEach( s => ValidationGenerator.touchAllFields( s.formGroup ) );
 
     if ( this.form.formGroup.invalid ) {
       return this.snackbar.open( 'Unable to proceed, the form is invalid', 'OK', { duration: 3000 });
     }
+
+    this.form.sections.forEach( section => {
+      section.fields.forEach( field => {
+        if ( field.type === 'ng-datetime' ) {
+          const formControl  = section.formGroup.get( field.name );
+          if ( formControl.value ) {
+            formControl.setValue( moment( formControl.value ).format( 'YYYY-MM-DD HH:mm' ) );
+          }
+        }
+      })
+    })
 
     this.setFieldsState( 'disable' );
     this.driversService.setDriver( this.form.formGroup.value, +this.id > 0 ? +this.id : null ).subscribe( result => {

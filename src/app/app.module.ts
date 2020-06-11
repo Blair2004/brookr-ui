@@ -21,6 +21,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoadDeliveryComponent } from './partials/dashboard/popups/load-delivery/load-delivery.component';
 import { DriversPaymentComponent } from './partials/dashboard/popups/drivers-payment/drivers-payment.component';
 import { environment } from '../environments/environment';
+import { LoadHistoryComponent } from './partials/dashboard/load-history/load-history.component';
 
 export const serviceCalled   = ServicesModule;
 
@@ -32,7 +33,8 @@ export const serviceCalled   = ServicesModule;
     DriverLoadStatus,
     PopupComponent,
     LoadDeliveryComponent,
-    DriversPaymentComponent
+    DriversPaymentComponent,
+    LoadHistoryComponent
   ],
   providers: [
     {

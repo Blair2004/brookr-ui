@@ -4,5 +4,5 @@
         <p *ngIf="mode === 'edit'" class="text-2xl mb-2">Editing a driver</p>
         <p class="text-gray-700">Drivers can pickup and deliver loads which are assigned to them or not yet assigned.</p>
     </div>
-    <app-tabs *ngIf="form" [form]="form" (submit)="handleSubmit( $event )"></app-tabs>
+    <app-tabs *ngIf="form" (changed)="handleFieldChange( $event )" [form]="form" (submit)="handleSubmit( $event )"></app-tabs>
 </app-layout>

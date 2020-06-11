@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TableConfig } from '@cloud-breeze/core';
+import { HttpErrorResponse } from "@angular/common/http";
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -62,6 +63,12 @@ export class ListComponent implements OnInit {
           this.tendoo.responsive.isLG(),
           this.tendoo.responsive.isXL(),
         ].includes( true ) ? '600px' : '80%',
+      })
+    } else if ( [ 'personal_card_url', 'medical_card_url' ].includes( event.menu.namespace ) ) {
+      this.tendoo.get( `${this.tendoo.baseUrl}brookr/drivers/${event.row.id}/assets/${event.menu.namespace}` ).subscribe( result => {
+        window.open( result[ 'data' ].url );
+      }, ( result: HttpErrorResponse ) => {
+        this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 3000 });
       })
     }
   }

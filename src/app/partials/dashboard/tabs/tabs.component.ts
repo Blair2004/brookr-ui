@@ -10,6 +10,7 @@ import { ValidationGenerator } from '@cloud-breeze/utilities';
 export class TabsComponent implements OnInit {
   @Input( 'form' ) form: Form;
   @Output( 'submit' ) submit  = new EventEmitter;
+  @Output( 'changed' )  changed = new EventEmitter;
 
   constructor() { }
 
@@ -30,6 +31,10 @@ export class TabsComponent implements OnInit {
   selectThis( section ) {
     this.form.sections.forEach( s => s[ 'active' ] = false );
     section.active  = true;
+  }
+
+  emitChanged( event ) {
+    this.changed.emit( event );
   }
 
   submitForm() {

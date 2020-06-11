@@ -205,7 +205,18 @@ const reducer    =   createReducer(
     on( AppActions.uncompressSidebar, ( state: AppState ) => ({ ...state, sidebarCompressed: false })),
     on( AppActions.login, ( state: AppState ) =>  ({ ...state, authenticated: true })),
     on( AppActions.logout, ( state: AppState ) =>  ({ ...state, authenticated: false })),
-    on( AppActions.toggleSidebar, ( state: AppState ) => ({ ...state, sidebarToggled : ! state.sidebarToggled, sidebarCompressed : ! state.sidebarToggled })),
+    on( AppActions.toggleSidebar, ( state: AppState ) => {
+        
+        let compressionStatus:boolean;
+
+        if ( state.sidebarToggled ) {
+            compressionStatus   =   true;
+        } else {
+            compressionStatus   =   false;
+        }
+
+        return ({ ...state, sidebarToggled : ! state.sidebarToggled, sidebarCompressed : compressionStatus });
+    }),
     on( AppActions.startAsyncLoading, ( state: AppState ) => ({ ...state, asyncLoading : true })),
     on( AppActions.stopAsyncLoading, ( state: AppState ) => ({ ...state, asyncLoading : false })),
     on( AppActions.fetchNotifications, ( state: AppState ) => {

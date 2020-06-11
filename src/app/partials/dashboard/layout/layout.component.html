@@ -9,23 +9,25 @@
     </div>
     <div class="flex h-full w-full">
         <div 
+            id="sidebar"
             [debounce]="500" 
             (trigger)="handleHoverEvent( $event )"
             id="sidebar" [ngClass]="{ 
             'absolute shadow z-50' : ( state$ | async ).sidebarToggled, 
             'hidden' : ! ( state$ | async ).sidebarToggled,
-            'w-64' : ! ( state$ | async ).sidebarCompressed || [ true ].includes( 
+            'w-64 expand-sidebar' : ! ( state$ | async ).sidebarCompressed || [ true ].includes( 
                 tendoo.responsive.isLG(), 
                 tendoo.responsive.isXL()
             ),
-            'w-16' : ( state$ | async ).sidebarCompressed
+            'w-16 compress-sidebar' : ( state$ | async ).sidebarCompressed
         }" class="lg:static lg:shadow-none h-full lg:flex lg:z-0 flex flex-col flex-shrink-0 bg-gray-200 p-2">
             <div class="logo flex pb-4 justify-center text-gray-800">
                 <span *ngIf="! ( state$ | async ).sidebarCompressed" class="p-6 brookr-font text-2xl block h-12 flex items-center" style="margin: 0;">
-                    <img [src]="urlPrefix + '/assets/images/logo.png'" alt="">
+                    <!-- <img [src]="urlPrefix + '/assets/images/smm-icon.png'" alt=""> -->
+                    <span class="text-xl font-bold">SMM Transport</span>
                 </span>
                 <span *ngIf="( state$ | async ).sidebarCompressed" style="margin: 0;">
-                    <img class="w-12 h-12" [src]="urlPrefix + '/assets/images/icon.png'" alt="">
+                    <img class="w-12 h-12" [src]="urlPrefix + '/assets/images/smm-icon.png'" alt="">
                 </span>
             </div>
             <div class="side-menu flex flex-auto flex-col text-gray-600 overflow-y-auto">
@@ -46,7 +48,8 @@
                             </div>
                         </ng-container>
                         <ng-container *ngIf="( menu.childrens === undefined || menu.childrens.length === 0 )">
-                            <a *ngIf="canSeeMenu( menu )" (click)="toggleSidebar() && closeAllMenus()" [routerLink]="menu.path" class="h-10 flex hover:bg-gray-300 px-4 py-2 items-center cursor-pointer menu rounded overflow-hidden">
+                            <a *ngIf="canSeeMenu( menu )" [routerLink]="menu.path" class="h-10 flex hover:bg-gray-300 px-4 py-2 items-center cursor-pointer menu rounded overflow-hidden">
+                                <!-- (click)="toggleSidebar() && closeAllMenus()" -->
                                 <div class="menu-icon w-5 h-5 pr-2 flex items-center justify-center">
                                     <mat-icon>{{ menu.icon }}</mat-icon>
                                 </div>
@@ -60,7 +63,8 @@
                         </ng-container>
                         <ng-container *ngIf="menu.toggled">
                             <ng-container *ngFor="let childMenu of menu.childrens">
-                                <a (click)="toggleSidebar(); closeAllMenus()" [routerLink]="childMenu.path" *ngIf="canSeeMenu( childMenu )" class="cursor-pointer menu rounded overflow-hidden flex hover:bg-gray-300 px-4 py-2 items-center">
+                                <a [routerLink]="childMenu.path" *ngIf="canSeeMenu( childMenu )" class="cursor-pointer menu rounded overflow-hidden flex hover:bg-gray-300 px-4 py-2 items-center">
+                                    <!-- (click)="toggleSidebar(); closeAllMenus()" -->
                                     <div class="menu-icon w-5 h-5 pr-2 flex items-center justify-center">
                                     </div>
                                     <div class="menu-text pl-2 flex items-center justify-between flex-auto">
@@ -107,7 +111,7 @@
                         <div class="w-full h-0" *ngIf="menuToggled">
                             <div class="rounded-b border-b border-l border-r border-gray-400 flex-auto bg-gray-100 relative shadow-lg z-10" style="margin-top: -8px;padding-top: 8px;">
                                 <ul>
-                                    <li><a class="p-2 block hover:bg-gray-300 cursor-pointer text-gray-700 hover:text-gray-800 flex items-center" routerLink="/dashboard/profile"><div class="mr-2 flex items-center"><mat-icon>account_circle</mat-icon></div> <div><span class="block">Profil</span></div></a></li>
+                                    <li><a class="p-2 block hover:bg-gray-300 cursor-pointer text-gray-700 hover:text-gray-800 flex items-center" routerLink="/dashboard/profile"><div class="mr-2 flex items-center"><mat-icon>account_circle</mat-icon></div> <div><span class="block">Profile</span></div></a></li>
                                     <li><a class="p-2 block hover:bg-gray-300 cursor-pointer text-gray-700 hover:text-gray-800 flex items-center" routerLink="/auth/logout"><div class="mr-2 flex items-center"><mat-icon>exit_to_app</mat-icon></div> <div><span class="block">Logout</span></div></a></li>
                                 </ul>
                             </div>
