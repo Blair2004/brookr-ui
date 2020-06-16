@@ -5,10 +5,11 @@ import { ReportsRoutingModule } from './reports-routing.module';
 import { DriversReportComponent } from './components/drivers-report/drivers-report.component';
 import { LoadsReportComponent } from './components/loads-report/loads-report.component';
 import { DeclarationsModule } from '../declarations/declarations.module';
+import { CompaniesReportComponent } from './components/companies-report/companies-report.component';
 
 
 @NgModule({
-  declarations: [ DriversReportComponent, LoadsReportComponent],
+  declarations: [ DriversReportComponent, LoadsReportComponent, CompaniesReportComponent],
   imports: [
     CommonModule,
     ReportsRoutingModule,

@@ -176,9 +176,9 @@ export const AppInitialState: AppState = {
             ],
             childrens: [
                 {
-                    label: 'Driver Statement',
+                    label: 'Company Report',
                     hasPermissions: [ 'brookr.see.reports' ],
-                    path: '/dashboard/reports/driver-statement'
+                    path: '/dashboard/reports/companies'
                 }, 
             ]
         }, {
