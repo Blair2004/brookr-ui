@@ -4,6 +4,7 @@ import { FormGroup } from "@angular/forms";
 import { ValidationGenerator } from '@cloud-breeze/utilities';
 import { CompanyService } from "../../../services/company.service";
 import * as moment from 'moment';
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 interface Section {
   title: string;
@@ -65,7 +66,8 @@ export class CompaniesReportComponent implements OnInit {
   companyFormGroup: FormGroup;
 
   constructor(
-    private companiesService: CompanyService
+    private companiesService: CompanyService,
+    private snackbar: MatSnackBar,
   ) { }
 
   ngOnInit(): void {
@@ -88,6 +90,26 @@ export class CompaniesReportComponent implements OnInit {
   setSectionActive( section: Section ) {
     this.sections.forEach( s => s.active = false );
     section.active  = true;
+
+    if ( section.identifier === 'fuel-management' ) {
+      this.loadHistory();
+    }
+  }
+
+  loadHistory() {
+    if ( this.companyFormGroup.get( 'company_id' ).value === undefined || this.companyFormGroup.get( 'company_id' ).value.length === 0 ) {
+      return this.snackbar.open( 'Consider selecting the company, the start and ending date used as the period during which the fuel record are attached.', 'RETRY', { duration : 20000 })
+        .afterDismissed()
+        .subscribe( action => {
+          if ( action.dismissedByAction ) {
+            this.loadHistory();
+          }
+        })
+    }
+
+    this.companiesService.getCompaniesFuels( this.companyFormGroup.value ).subscribe( ( fuels ) => {
+      
+    })
   }
 
   get activeSection() {

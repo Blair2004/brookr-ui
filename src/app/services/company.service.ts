@@ -16,4 +16,8 @@ export class CompanyService {
   getCompanies() {
     return this.tendoo.get( `${this.tendoo.baseUrl}brookr/companies` );
   }
+
+  getCompaniesFuels( value ) {
+    return this.tendoo.post( `${this.tendoo.baseUrl}brookr/companies/get-fuels`, value );
+  }
 }
