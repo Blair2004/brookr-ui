@@ -15,7 +15,10 @@ import { DriversPaymentComponent } from '../../../partials/dashboard/popups/driv
 export class ListComponent implements OnInit {
   config: TableConfig;
   isLoading   = false;
-  sort = {};
+  sort        = {
+    direction: 'desc',
+    active: 'created_at'
+  };
   search = {};
   page = {};
   perPage = {

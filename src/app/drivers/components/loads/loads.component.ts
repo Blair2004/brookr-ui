@@ -21,19 +21,63 @@ import { ValidationGenerator } from '@cloud-breeze/utilities';
 export class LoadsComponent implements OnInit {
   config: BrookrTableConfig;
 
+  assignedCrudConfig   =   {
+    sort        : {
+      direction: 'desc',
+      active: 'created_at'
+    },
+    search      : {},
+    page        : {},
+    query       : {},
+    bulkMenus   : [],
+    perPage     : {
+      per_page : 30
+    }
+  }
+
+  unassignedCrudConfig   =   {
+    sort        : {
+      direction: 'desc',
+      active: 'created_at'
+    },
+    search      : {},
+    page        : {},
+    query       : {},
+    bulkMenus   : [],
+    perPage     : {
+      per_page : 30
+    }
+  }
+
   sections  =   [
     {
       title: 'Assigned Loads',
       namespace: 'assigned.loads',
       description: 'Loads assigned to your account.',
       active: false,
-      crud: this.tendoo.crud.getConfig( 'brookr.drivers-loads.assigned' )
+      crud: () => {
+        return this.tendoo.crud.getConfig( 'brookr.drivers-loads.assigned', {
+          ...this.assignedCrudConfig.page,
+          ...this.assignedCrudConfig.perPage,
+          ...this.assignedCrudConfig.query,
+          ...this.assignedCrudConfig.search,
+          ...this.assignedCrudConfig.sort,
+        })
+      }
     }, {
       title: 'Unassigned Loads',
       namespace: 'unassigned.loads',
       description: 'Pending Loads not assigned to a driver.',
       active: false,
-      crud: this.tendoo.crud.getConfig( 'brookr.drivers-loads.unassigned' )
+      crud: () => {
+        return this.tendoo.crud.getConfig( 'brookr.drivers-loads.unassigned', {
+          ...this.unassignedCrudConfig.page,
+          ...this.unassignedCrudConfig.perPage,
+          ...this.unassignedCrudConfig.query,
+          ...this.unassignedCrudConfig.search,
+          ...this.unassignedCrudConfig.sort,
+        })
+      }
     }
   ]
 
@@ -54,7 +98,7 @@ export class LoadsComponent implements OnInit {
   }
 
   loadActiveTabConfiguration() {
-    this.active.crud.subscribe( (config: BrookrTableConfig ) => {
+    this.active.crud().subscribe( (config: BrookrTableConfig ) => {
       this.config   = config;
     }, ( result: HttpErrorResponse ) => {
       this.config   = undefined;
@@ -68,6 +112,24 @@ export class LoadsComponent implements OnInit {
 
   handleRefresh() {
     this.setTabActive( this.active );
+  }
+
+  handleSort( event ) {
+    if ( this.active.namespace === 'assigned.loads' ) {
+        this.assignedCrudConfig.sort  = event;
+      } else {
+        this.unassignedCrudConfig.sort  = event;
+      }
+      this.loadActiveTabConfiguration();
+  }
+
+  handleNavigation( page ) {
+    if ( this.active.namespace === 'assigned.loads' ) {
+      this.assignedCrudConfig.page  = { page };
+    } else {
+      this.unassignedCrudConfig.page  = { page };
+    }
+    this.loadActiveTabConfiguration();
   }
 
   handleAction( action ) {
@@ -138,6 +200,33 @@ export class LoadsComponent implements OnInit {
               label: 'No',
               onClick: () => {
                 this.dialog.getDialogById( 'awaiting-load' ).close();
+              }
+            }
+          ]
+        }
+      })
+    } else if ( action.menu.namespace === 'brookr.unassign-load' ) {
+      this.dialog.open( DialogComponent, {
+        id: 'brookr.unassign-load',
+        data: <ConfirmDialogObject>{
+          title: 'Unassign Yourself',
+          message: 'Would you like to unassign yourself from this delivery ?',
+          buttons: [
+            {
+              namespace: 'yes',
+              label: 'Yes',
+              onClick: () => {
+                this.tendoo.get( `${this.tendoo.baseUrl}brookr/loads/unassign/{id}`.replace( '{id}', action.row.id) ).subscribe( result => {
+                  this.setTabActive( this.active );
+                  this.snackbar.open( result[ 'message' ], 'OK', { duration: 3000 });
+                  this.dialog.getDialogById( 'brookr.unassign-load' ).close();
+                })
+              }
+            }, {
+              namespace: 'no',
+              label: 'No',
+              onClick: () => {
+                this.dialog.getDialogById( 'brookr.unassign-load' ).close();
               }
             }
           ]

@@ -18,13 +18,16 @@ export class ListComponent implements OnInit {
 
   config: TableConfig;
   isLoading   = false;
-  sort        = {};
+  sort        = {
+    direction: 'desc',
+    active: 'created_at'
+  };
   search      = {};
   page        = {};
   query       = {};
   bulkMenus   = [];
   perPage     = {
-    per_page : 10
+    per_page : 100
   }
   hasLoaded   = false;
   constructor(

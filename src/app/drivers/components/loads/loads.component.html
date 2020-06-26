@@ -19,7 +19,8 @@
                 (action)="handleAction( $event )"
                 *ngIf="config" 
                 (refresh)="handleRefresh( $event )"
-                (sort)="handleSort( $event )" 
+                (sort)="handleSort( $event )"
+                (navigate)="handleNavigation( $event )" 
                 (search)="handleSearch( $event )" 
                 [config]="config"></app-table>
         </div>
