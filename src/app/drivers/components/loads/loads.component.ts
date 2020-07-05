@@ -149,6 +149,12 @@ export class LoadsComponent implements OnInit {
       }, ( result: HttpErrorResponse ) => {
         this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 6000 });
       })
+    } else if ( [ 'rate_document_url' ].includes( action.menu.namespace ) ) {
+      this.tendoo.get( `${this.tendoo.baseUrl}brookr/loads/${action.row.id}/assets/${action.menu.namespace}` ).subscribe( result => {
+        window.open( result[ 'data' ].url );
+      }, ( result: HttpErrorResponse ) => {
+        this.snackbar.open( result[ 'error' ].message || result.message, 'OK', { duration: 3000 });
+      })
     } else if ( action.menu.namespace === 'brookr.start-delivery' ) {
       this.dialog.open( PopupComponent, {
         id: 'start-delivery',

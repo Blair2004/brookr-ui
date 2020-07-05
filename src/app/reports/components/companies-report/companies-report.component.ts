@@ -8,6 +8,8 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { TendooService } from '@cloud-breeze/services';
+// import * as jsPDF from 'jspdf';
+import * as html2pdf from 'html2pdf.js';
 
 interface Section {
   title: string;
@@ -93,6 +95,26 @@ export class CompaniesReportComponent implements OnInit, OnChanges {
       validation: 'required'
     }, 
   ];
+
+  printReport() {
+    var element = document.getElementById('report-table');
+    var opt = {
+      margin:       0.1,
+      filename:     'report.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 1.5 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+    };
+    console.log( 'Hellooo !!' );
+    html2pdf().from(element).set(opt).save();
+    // const doc   = new jsPDF( 'landscape' );
+    // doc.html( document.getElementById('report-table'), {
+    //   callback: ( doc ) => {
+    //     doc.save();
+    //   }
+    // })
+    // doc.save( 'Print.pdf' );
+  }
 
   companyFormGroup: FormGroup;
   reportLoaded: boolean   = false;

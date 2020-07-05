@@ -56,16 +56,28 @@ export class ListComponent implements OnInit {
         data: {
           resource: event.row,
           formNamespace: 'brookr.advance-payment.drivers',
-          postNamespace: 'brookr/drivers/payments/'
+          postNamespace: 'brookr/drivers/payments/',
+          tabs: [
+            {
+              label: 'Make Payment',
+              identifier: 'new',
+              active: true
+            }, {
+              label: 'History',
+              identifier: 'history',
+              active: false
+            }
+          ],
+          title: 'Payment Managements'
         },
         width: [
           this.tendoo.responsive.isLG(),
           this.tendoo.responsive.isXL(),
-        ].includes( true ) ? '600px' : '80%',
+        ].includes( true ) ? '700px' : '80%',
         height: [
           this.tendoo.responsive.isLG(),
           this.tendoo.responsive.isXL(),
-        ].includes( true ) ? '600px' : '80%',
+        ].includes( true ) ? '700px' : '80%',
       })
     } else if ( [ 'personal_card_url', 'medical_card_url' ].includes( event.menu.namespace ) ) {
       this.tendoo.get( `${this.tendoo.baseUrl}brookr/drivers/${event.row.id}/assets/${event.menu.namespace}` ).subscribe( result => {

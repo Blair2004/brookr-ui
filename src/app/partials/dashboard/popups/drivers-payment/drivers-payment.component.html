@@ -1,14 +1,47 @@
 <div id="container" class="flex h-full flex-col">
     <div class="header p-4 flex justify-center items-center text-xl border-b border-gray-400">
-        Advance Payment
+        {{ title }}
     </div>
     <div class="body overflow-y-auto flex-auto">
-        <div *ngIf="! form" class="h-full w-full flex justify-center items-center">
-            <mat-spinner diameter="20"></mat-spinner>
+        <div class="bg-white">
+            <nav class="flex flex-col sm:flex-row">
+                <button (click)="setActive( tab )" *ngFor="let tab of tabs" [ngClass]="tab.active ? 'text-blue-500 border-b-2 font-medium border-blue-500' : ''" class="text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none">
+                    {{ tab.label }}
+                </button>
+            </nav>
         </div>
-        <form *ngIf="form" class="popup-conatiner" [formGroup]="form.formGroup" class="p-2">
-            <cb-field [field]="field" [group]="form.sections[0].formGroup" *ngFor="let field of form.sections[0].fields"></cb-field>  
-        </form>
+        <div *ngIf="selectedTab.identifier === 'new'">
+            <div *ngIf="! form" class="h-full w-full flex justify-center items-center">
+                <mat-spinner diameter="20"></mat-spinner>
+            </div>
+            <form *ngIf="form" class="popup-conatiner" [formGroup]="form.formGroup" class="p-2">
+                <cb-field [field]="field" [group]="form.sections[0].formGroup" *ngFor="let field of form.sections[0].fields"></cb-field>  
+            </form>
+        </div>
+        <div *ngIf="selectedTab.identifier === 'history'" class="p-2">
+            <table class="w-full text-md bg-white rounded mb-4">
+                <tbody>
+                    <tr class="border-b bg-gray-200">
+                        <th class="text-left p-3 px-1">Payment</th>
+                        <th class="text-left p-3 px-1">Date</th>
+                        <th class="text-left p-3 px-1">Reason</th>
+                        <th class="text-right p-3 px-1">Actions</th>
+                    </tr>
+                    <tr *ngFor="let _history of history" class="border-b hover:bg-orange-100 bg-gray-100">
+                        <td class="p-3 px-1">{{ _history.amount }}</td>
+                        <td class="p-3 px-1">{{ _history.date }}</td>
+                        <td class="p-3 px-1">{{ _history.description }}</td>
+                        <td class="p-3 px-1 flex justify-end">
+                            <button type="button" (click)="openPaymentPopup( _history )" class="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Edit</button>
+                            <button type="button" (click)="deletePayment( _history )" class="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Delete</button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="history.length === 0">
+                        <td colspan="4" class="p-3 px-1 text-center">No entries to display</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="footer border-t border-gray-400 p-2 flex justify-end items-center">
         <button (click)="savePayment()" class="rounded border p-2 ml-2 border-green-400 bg-green-200 hover:bg-green-400 hover:text-white flex justify-center items-center">Confirm</button>
