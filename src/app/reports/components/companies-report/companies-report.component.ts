@@ -5,11 +5,13 @@ import { ValidationGenerator } from '@cloud-breeze/utilities';
 import { CompanyService } from "../../../services/company.service";
 import * as moment from 'moment';
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { TendooService } from '@cloud-breeze/services';
 // import * as jsPDF from 'jspdf';
 import * as html2pdf from 'html2pdf.js';
+import { forkJoin } from 'rxjs';
+import { DriversService } from '../../../services/drivers.service';
 
 interface Section {
   title: string;
@@ -61,7 +63,29 @@ export class CompaniesReportComponent implements OnInit, OnChanges {
       description: 'Add a new fuel expense to the current load',
       validation: 'required',
       appearance: 'outline',
-      name: 'fuel'
+      name: 'amount'
+    }, {
+      type: 'select',
+      options: [],
+      label: 'Driver',
+      description: 'assign the fuel to a driver',
+      validation: 'required',
+      appearance: 'outline',
+      name: 'driver_id'
+    }, {
+      type: 'datetime',
+      options: [],
+      label: 'Date',
+      description: 'Set the date for the fuel expense',
+      validation: 'required',
+      appearance: 'outline',
+      name: 'date'
+    }, {
+      type: 'textarea',
+      label: 'Date',
+      description: 'Provide a description for the fuel expense',
+      appearance: 'outline',
+      name: 'description'
     }
   ];
 
@@ -87,13 +111,25 @@ export class CompaniesReportComponent implements OnInit, OnChanges {
       description: 'Select the range ends. Time ends at 11:59pm',
       validation: 'required'
     }, {
-      type: 'select',
+      type: 'multiple_select',
       options: [],
       name: 'driver_id',
       label: 'Driver',
       description: 'Select the driver from the company from which you would like to generate the report.',
       validation: 'required'
-    }, 
+    }, {
+      type: 'select',
+      options: [],
+      name: 'pickup_location',
+      label: 'Pick Up Location',
+      description: 'Select the location from where the delivery has started.',
+    }, {
+      type: 'select',
+      options: [],
+      name: 'delivery_location',
+      label: 'Delivery Location',
+      description: 'Select the location from where the delivery has been delivered.',
+    },
   ];
 
   printReport() {
@@ -119,12 +155,14 @@ export class CompaniesReportComponent implements OnInit, OnChanges {
   companyFormGroup: FormGroup;
   reportLoaded: boolean   = false;
   fuelRecords: any[];
+  drivers: any[];
 
   constructor(
     private companiesService: CompanyService,
     private snackbar: MatSnackBar,
     private dialog: MatDialog,
-    private tendoo: TendooService
+    private tendoo: TendooService,
+    private driversService: DriversService
   ) { }
 
   ngOnChanges() {
@@ -132,7 +170,13 @@ export class CompaniesReportComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.fuelForm           =   ValidationGenerator.buildFormGroup( this.fuelFields ).formGroup;
-    this.companiesService.getCompanies().subscribe( ( companies: any[] ) => {
+    forkJoin([
+      this.companiesService.getCompanies(),
+      this.tendoo.get( `${this.tendoo.baseUrl}brookr/locations` ),
+      this.driversService.getDrivers()
+    ]).subscribe( ( result ) => {
+      this.drivers            = <any[]>result[2];
+      const companies         = <any[]>result[0];
       const keyValueOptions   = [];
 
       companies.forEach( company => {
@@ -146,7 +190,6 @@ export class CompaniesReportComponent implements OnInit, OnChanges {
       this.companyFormGroup           =   ValidationGenerator.buildFormGroup( this.companyFields ).formGroup;
 
       this.companyFormGroup.valueChanges.subscribe( form => {
-        console.log( form );
         if ( form.company_id !== null && form.driver_id === null ) {
           this.companiesService.getCompanyDrivers( form.company_id ).subscribe( company => {
             this.companyFields[3].options   = company[ 'drivers' ].map( driver => {
@@ -158,11 +201,18 @@ export class CompaniesReportComponent implements OnInit, OnChanges {
           })
         }
       })
+
+      this.fuelFields[1].options  = this.drivers.map( driver => {
+        return {
+          label: `${driver.first_name} ${driver.last_name}`,
+          value: driver.id
+        }
+      })
     });
   }
 
   saveFuelExpense() {
-    this.companiesService.saveFuelExpense( this.companyFormGroup.value, this.fuelFields[0].control.value, this.fullReport.report.id ).subscribe( result => {
+    this.companiesService.saveFuelExpense( this.fuelForm.value ).subscribe( result => {
       this.snackbar.open( result[ 'message' ], 'OK', { duration: 3000 });
       this.loadHistory();
       this.fuelForm.reset();
@@ -170,10 +220,6 @@ export class CompaniesReportComponent implements OnInit, OnChanges {
   }
 
   setSectionActive( section: Section ) {
-    if ( ! this.reportLoaded ) {
-      return this.snackbar.open( 'Please specificy the time range and the company for which you would like to manage the report', 'OK', { duration: 6000 });
-    }
-
     this.sections.forEach( s => s.active = false );
     section.active  = true;
 

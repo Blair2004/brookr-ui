@@ -8,6 +8,8 @@ import { LoadAssignationComponent } from '../../../partials/dashboard/load-assig
 import { LoadStatusComponent } from '../../../partials/dashboard/load-status/load-status.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { LoadHistoryComponent } from '../../../partials/dashboard/load-history/load-history.component';
+import { ManageComponent } from '../manage/manage.component';
+import { EditComponent } from '../edit/edit.component';
 
 @Component({
   selector: 'app-list',
@@ -27,7 +29,7 @@ export class ListComponent implements OnInit {
   query       = {};
   bulkMenus   = [];
   perPage     = {
-    per_page : 100
+    per_page : 20
   }
   hasLoaded   = false;
   constructor(
@@ -119,6 +121,8 @@ export class ListComponent implements OnInit {
       this.router.navigateByUrl( event.menu.url.replace( '{id}', event.row.id ) );
     } else if ( event.menu.type === 'OPEN' && event.menu.namespace === 'open.assign_driver' ) {
       this.openLoadAssignation( event.menu );
+    } else if ( event.menu.type === 'OPEN' && event.menu.namespace === 'edit.loads' ) {
+      this.openLoadEdition( event );
     } else if ( event.menu.type === 'OPEN' && event.menu.namespace === 'open.change_status' ) {
       this.openLoadChangeStatus( event.menu );
     } else if ( [ 'rate_document_url', 'delivery_document_url' ].includes( event.menu.namespace ) ) {
@@ -183,7 +187,6 @@ export class ListComponent implements OnInit {
   }
 
   openLoadChangeStatus( menu ) {
-    console.log( menu );
     const dialog  = this.dialog.open( LoadStatusComponent, {
       id: 'load-status',
       data: menu,
@@ -199,7 +202,6 @@ export class ListComponent implements OnInit {
 
     dialog.afterClosed().subscribe( action => {
       this.ngOnInit();
-      console.log( action );
     })
   }
 
@@ -219,7 +221,25 @@ export class ListComponent implements OnInit {
 
     dialog.afterClosed().subscribe( action => {
       this.ngOnInit();
-      console.log( action );
+    })
+  }
+
+  openLoadEdition( menu ) {
+    const dialog  = this.dialog.open( EditComponent, {
+      id: 'edit-load',
+      data: menu,
+      height: [ 
+        this.tendoo.responsive.isSM(),
+        this.tendoo.responsive.isXS(), 
+      ].includes( true ) ? '80%' : '80%',
+      width: [ 
+        this.tendoo.responsive.isSM(),
+        this.tendoo.responsive.isXS(), 
+      ].includes( true ) ? '70%' : '70%',
+    });
+
+    dialog.afterClosed().subscribe( action => {
+      this.ngOnInit();
     })
   }
 

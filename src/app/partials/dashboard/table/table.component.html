@@ -48,12 +48,12 @@
             </div>
         </div>
     </div>
-    <div class="overflow-x-auto overflow-y-auto flex flex-shrink-0">
-        <div class="overflow-y-auto w-full">
+    <div class="flex-auto overflow-hidden flex">
+        <div class="overflow-auto w-full">
             <table class="w-full table">
                 <thead class="text-gray-700">
                     <tr>
-                        <td *ngFor="let columnName of columnsNames" class="p-2 border border-gray-200 cursor-pointer" [ngStyle]="{ 'min-width': ( columnName !== '$id' ? columns[ columnName ]?.props?.style?.minWidth || '150px' : '20px' ) }">
+                        <td *ngFor="let columnName of columnsNames" class="p-2 border border-gray-200 cursor-pointer" [ngStyle]="{ 'min-width': ( columnName !== '$id' ? columns[ columnName ]?.props?.style?.minWidth || '80px' : '20px' ) }">
                             <ng-container *ngIf="columnName !== '$id'">
                                 <div (click)="toggleOrderColumn( columnName, columns[ columnName ] )" class="flex justify-between items-center">
                                     <span style="font-weight: 400;" class="py-2">{{ columns[ columnName ].label }}</span>
@@ -82,12 +82,12 @@
                 </tbody>
                 <tbody>
                     <tr *ngFor="let row of rows" [ngClass]="row?.$props?.className">
-                        <td *ngFor="let columnName of columnsNames" [ngClass]="row?.$props?.tdClassName || 'border-gray-200 text-gray-800'" class="p-2 border">
+                        <td *ngFor="let columnName of columnsNames" [ngClass]="row?.$props?.checked ? 'bg-blue-400 text-white border-blue-500' : row?.$props?.tdClassName || 'border-gray-200 text-gray-800'" class="p-2 border">
                             <div class="flex justify-between items-center">
                                 <span *ngIf="! [ '$actions', '$id' ].includes( columnName )">{{ row[ columnName ] }}</span>
                                 <span *ngIf="[ '$id' ].includes( columnName )"><mat-checkbox [(ngModel)]="row.$props.checked" color="warn"></mat-checkbox></span>
                                 <span *ngIf="[ '$actions' ].includes( columnName )">
-                                    <button mat-stroked-button color="primary" [matMenuTriggerFor]="entryAction"><mat-icon>more_horiz</mat-icon> Options</button>
+                                    <button mat-stroked-button color="primary" [matMenuTriggerFor]="entryAction"><mat-icon>more_horiz</mat-icon></button>
                                     <mat-menu #entryAction="matMenu">
                                         <button (click)="singleActionClick( row, menu )" *ngFor="let menu of row[ columnName ]" mat-menu-item>{{ menu.label }}</button>
                                     </mat-menu>

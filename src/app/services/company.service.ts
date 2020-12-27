@@ -25,7 +25,7 @@ export class CompanyService {
     return this.tendoo.get( `${this.tendoo.baseUrl}brookr/companies/${id}/drivers` );
   }
 
-  saveFuelExpense( form, amount, report_id ) {
-    return this.tendoo.post( `${this.tendoo.baseUrl}brookr/companies/${form.company_id}/fuel`, { ...form, amount, report_id });
+  saveFuelExpense( data ) {
+    return this.tendoo.post( `${this.tendoo.baseUrl}brookr/expenses/fuel`, data );
   }
 }

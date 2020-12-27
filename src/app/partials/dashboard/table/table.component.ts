@@ -195,7 +195,6 @@ export class TableComponent implements OnInit {
     if ( menu.onClick !== undefined ) {
       menu.onClick( row );
     }
-    console.log( row, menu );
     this.action.emit({ menu, row });
   }
 

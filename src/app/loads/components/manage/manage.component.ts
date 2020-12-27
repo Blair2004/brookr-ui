@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -7,6 +7,7 @@ import { TendooService } from '@cloud-breeze/services';
 import { ValidationGenerator } from '@cloud-breeze/utilities';
 import { LoadsService } from '../../../services/loads.service';
 import * as moment from 'moment';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-manage',
@@ -15,7 +16,9 @@ import * as moment from 'moment';
 })
 export class ManageComponent implements OnInit {
   form: Form;
-  id : number;
+  @Output( 'changed' ) changed          = new EventEmitter<any>();
+  @Input( 'id' ) id : number;
+  @Input( 'layout' ) layout: boolean    = true;
   mode  = 'create';
 
   constructor(
@@ -28,11 +31,15 @@ export class ManageComponent implements OnInit {
 
   ngOnInit(): void {
     this.activeSnapShot.paramMap.subscribe( param => {
-      if ( param.get( 'id' ) ) {
+      if ( param.get( 'id' ) && this.id === undefined ) {
         this.mode   = 'edit';
         this.id   = +param.get( 'id' );
       }
     });
+
+    if ( this.id !== undefined ) {
+      this.mode   = 'edit';
+    }
     
     this.tendoo.forms.getPublicForm( 'brookr.loads', this.id || undefined ).subscribe( ( form: Form ) => {
       form.sections.forEach( s => {
@@ -51,6 +58,13 @@ export class ManageComponent implements OnInit {
       })
       this.form   = form;
     })
+  }
+
+  clearCustomer() {
+    this.form.sections[1].formGroup.controls[ 'brooker_id' ].setValue( '' );
+  }
+  clearDriver() {
+    this.form.sections[2].formGroup.controls[ 'driver_id' ].setValue( '' );
   }
 
   handleSubmit( form: Form ) {
@@ -80,11 +94,13 @@ export class ManageComponent implements OnInit {
       })
     });
 
-    console.log( formData );
-
     this.loadsService.registerLoads( formData, this.id ).subscribe( result => {
       this.snackbar.open( result[ 'message' ], 'OK', { duration: 3000 });
-      this.router.navigateByUrl( '/dashboard/loads' );
+      if ( this.layout ) {
+        this.router.navigateByUrl( '/dashboard/loads' );
+      } else {
+        this.changed.emit( result );
+      }
     }, ( result: HttpErrorResponse ) => {
       this.snackbar.open( result[ 'error' ].message || result.message || 'An unexpected error has occured.', 'OK', { duration: 6000 });
       this.form.sections.forEach( s => ValidationGenerator.enableFields( s.fields ) );

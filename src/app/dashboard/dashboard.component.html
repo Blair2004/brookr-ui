@@ -72,7 +72,8 @@
                         <li *ngFor="let driver of driversByMedical" class="px-4 py-2 border-b border-gray-300 flex justify-between items-center">
                             <span class="text-gray-700 flex flex-auto justify-between items-center">
                                 <span>{{ driver.first_name }} {{ driver.last_name }}</span>
-                                <span>{{ driver.medical_card_expiration | date }}</span>
+                                <span *ngIf="driver.medical_card_expiration">{{ driver.medical_card_expiration | date }}</span>
+                                <span *ngIf="! driver.medical_card_expiration">N/A</span>
                             </span>
                             <div class="ml-4"><button [routerLink]="'/dashboard/drivers/edit/' + driver.driver_id" class="rounded-lg bg-white px-2 py-1 shadow text-sm hover:bg-green-400 hover:text-white">Edit</button></div>
                         </li>
@@ -89,7 +90,8 @@
                         <li *ngFor="let driver of driversByLicense" class="px-4 py-2 border-b border-gray-300 flex justify-between items-center">
                             <span class="text-gray-700 flex flex-auto justify-between items-center">
                                 <span>{{ driver.first_name }} {{ driver.last_name }}</span>
-                                <span>{{ driver.driving_license_expiration | date }}</span>
+                                <span *ngIf="driver.driving_license_expiration">{{ driver.driving_license_expiration | date }}</span>
+                                <span *ngIf="! driver.driving_license_expiration">N/A</span>
                             </span>
                             <div class="ml-4"><button [routerLink]="'/dashboard/drivers/edit/' + driver.driver_id" class="rounded-lg bg-white px-2 py-1 shadow text-sm hover:bg-green-400 hover:text-white">Edit</button></div>
                         </li>
